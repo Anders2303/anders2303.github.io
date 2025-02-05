@@ -10,11 +10,11 @@ function applySvgArgs(svgObj, attrObj) {
     return Object.entries(attrObj).forEach(([k, v]) => svgObj.setAttributeNS(null, k, v))
 }
 
-let corners = []
+let cordinates = []
 
 for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
-        corners.push([100 * i, 100 * j])
+        cordinates.push([i, j])
     }
 
 
@@ -37,6 +37,12 @@ for (let i = 0; i < 4; i++) {
         y2: 300,
     })
 
+
+
+
+
+
+
     // lineHoriz.setAttributeNS(null, "stroke", "gray")
     // lineVert.setAttributeNS(null, "stroke", "gray")
 
@@ -57,9 +63,10 @@ for (let i = 0; i < 4; i++) {
 
     baseSvg.appendChild(lineHoriz)
     baseSvg.appendChild(lineVert)
+
 }
 
-corners.forEach(([x, y]) => {
+cordinates.forEach(([i, j]) => {
     const rect = document.createElementNS(SVG_NS_URI, "rect")
     rect.setAttributeNS
 
@@ -69,11 +76,53 @@ corners.forEach(([x, y]) => {
         fill: "white",
         width: 4,
         height: 4,
-        x: x - 2,
-        y: y - 2,
+        x: 100 * i - 2,
+        y: 100 * j - 2,
     })
 
     baseSvg.appendChild(rect)
 })
+
+const randomCordIndex = Math.floor(Math.random() * cordinates.length)
+// Stupid way to do this:
+const neighbours = []
+
+if (randomCordIndex > 3) {
+    neighbours.push(randomCordIndex - 4)
+}
+
+if (randomCordIndex < 12) {
+    neighbours.push(randomCordIndex + 4)
+}
+
+if (randomCordIndex % 4 !== 0) {
+    neighbours.push(randomCordIndex - 1)
+}
+
+if (randomCordIndex % 4 !== 3) {
+    neighbours.push(randomCordIndex + 1)
+}
+
+const pointCircle = document.createElementNS(SVG_NS_URI, "circle")
+applySvgArgs(pointCircle, {
+    cx: cordinates[randomCordIndex][0] * 100,
+    cy: cordinates[randomCordIndex][1] * 100,
+    r: 8,
+    stroke: "red"
+})
+
+neighbours.forEach(i => {
+    const neighbourCircle = document.createElementNS(SVG_NS_URI, "circle")
+    applySvgArgs(neighbourCircle, {
+        cx: cordinates[i][0] * 100,
+        cy: cordinates[i][1] * 100,
+        r: 4,
+        stroke: "blue"
+    })
+    baseSvg.appendChild(neighbourCircle)
+
+})
+
+baseSvg.appendChild(pointCircle)
 
 // }
