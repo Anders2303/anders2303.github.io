@@ -1,33 +1,24 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+        <script src="./script.js" defer></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <script src="./script.js" defer></script>
-</head>
+    <body class="bg-gray-200 min-h-screen py-6 px-12">
+        <!-- TODOs -->
+        <!-- * Hide base svg -->
+        <!-- * copy svg a bunch (100 times?) -->
+        <!-- * render each copy on the page -->
+        <!-- * download svgs: https://stackoverflow.com/questions/57798877/button-for-downloading-svg-in-javascript-html -->
+        <!--    * One button for all, and one for each? -->
+        <div class="">
+            <h1 class="text-4xl">Get yer tile on</h1>
 
-<body class="bg-gray-200 min-h-screen">
-
-    <div>
-
-        <h1 class="text-4xl">Get yer tile on</h1>
-
-        <div class="p-2">
-            <svg id="base-svg" class="bg-white" width="400px" height="400px" viewBox="-10 -10 320 320"
-                xmlns="http://www.w3.org/2000/svg" stroke-width="1" stroke="black">
-                <rect x="200" y="200">
-
-                </rect>
-            </svg>
+            <div id="card-container" class="mt-16 flex flex-wrap justify-evenly gap-6">
+            </div>
         </div>
-    </div>
-
-
-
-</body>
-
-
-
+    </body>
 </html>

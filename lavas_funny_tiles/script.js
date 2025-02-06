@@ -1,128 +1,124 @@
+const SVG_NS_URI = "http://www.w3.org/2000/svg";
 
-const SVG_NS_URI = 'http://www.w3.org/2000/svg'
-const baseSvg = document.getElementById("base-svg")
+const GRID_STYLE = {
+    stroke: "gray",
+    "stroke-width": 1,
+};
+
+const WALL_STYLE = {
+    stroke: "#1a8e28",
+    "stroke-width": 8,
+};
+
+const SQUARE_STYLE = {
+    "stroke-width": 2,
+    stroke: "black",
+    fill: "#23e471",
+    width: 6,
+    height: 6,
+};
 
 function compStyle(obj) {
-    return Object.entries(obj).map(([k, v]) => `${k}: ${v};`).join(" ")
+    return Object.entries(obj)
+        .map(([k, v]) => `${k}: ${v};`)
+        .join(" ");
 }
 
 function applySvgArgs(svgObj, attrObj) {
-    return Object.entries(attrObj).forEach(([k, v]) => svgObj.setAttributeNS(null, k, v))
+    return Object.entries(attrObj).forEach(([k, v]) =>
+        svgObj.setAttributeNS(null, k, v)
+    );
 }
 
-let cordinates = []
+// let cordinates = []
 
-for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 4; j++) {
-        cordinates.push([i, j])
+// RUNS ON MOUNT
+generateCards();
+
+function generateCards(amt = 100) {
+    // Clear children
+    // myNode.innerHTML = ''
+
+    for (let index = 0; index < amt; index++) {
+        generateCard(index);
+    }
+}
+
+function generateCard(cardNumber) {
+    const cardContainer = document.getElementById("card-container");
+
+    const downloadLink = document.createElement("a");
+
+    const svgCardRoot = document.createElementNS(SVG_NS_URI, "svg");
+    applySvgArgs(svgCardRoot, {
+        class: "bg-white",
+        width: "400px",
+        height: "400px",
+        viewBox: "-10 -10 320 320",
+    });
+
+    addLinesToSvg(svgCardRoot);
+
+    const svgBlob = new Blob([svgCardRoot.outerHTML], {
+        type: "image/svg+xml",
+    });
+    downloadLink.download = `room-tile-${cardNumber}.svg`;
+    downloadLink.href = window.URL.createObjectURL(svgBlob);
+
+    downloadLink.appendChild(svgCardRoot);
+    cardContainer.appendChild(downloadLink);
+}
+
+function addLinesToSvg(svgCardRoot) {
+    const squareGroup = document.createElementNS(SVG_NS_URI, "g");
+    const gridGroup = document.createElementNS(SVG_NS_URI, "g");
+    const wallGroup = document.createElementNS(SVG_NS_URI, "g");
+
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            const rect = document.createElementNS(SVG_NS_URI, "rect");
+
+            const x = 100 * j;
+            const y = 100 * i;
+
+            applySvgArgs(rect, {
+                ...SQUARE_STYLE,
+                x: x - SQUARE_STYLE.width / 2,
+                y: y - SQUARE_STYLE.width / 2,
+            });
+            squareGroup.appendChild(rect);
+
+            // Right wall
+            if (j % 4 !== 3) {
+                const rightLine = document.createElementNS(SVG_NS_URI, "line");
+                const isWall = Math.random() < 0.25;
+
+                applySvgArgs(rightLine, {
+                    ...(isWall ? WALL_STYLE : GRID_STYLE),
+                    x1: x,
+                    y1: y,
+                    x2: x + 100,
+                    y2: y,
+                });
+                (isWall ? wallGroup : gridGroup).appendChild(rightLine);
+            }
+            // Downward wall
+            if (i < 3) {
+                const downLine = document.createElementNS(SVG_NS_URI, "line");
+                const isWall = Math.random() < 0.75;
+                applySvgArgs(downLine, {
+                    ...(isWall ? WALL_STYLE : GRID_STYLE),
+                    x1: x,
+                    y1: y,
+                    x2: x,
+                    y2: y + 100,
+                });
+                (isWall ? wallGroup : gridGroup).appendChild(downLine);
+            }
+        }
     }
 
-
-    const lineHoriz = document.createElementNS(SVG_NS_URI, "line")
-    const lineVert = document.createElementNS(SVG_NS_URI, "line")
-
-    applySvgArgs(lineHoriz, {
-        stroke: "gray",
-        x1: 0,
-        y1: 100 * i,
-        x2: 300,
-        y2: 100 * i
-    })
-
-    applySvgArgs(lineVert, {
-        stroke: "gray",
-        x1: 100 * i,
-        y1: 0,
-        x2: 100 * i,
-        y2: 300,
-    })
-
-
-
-
-
-
-
-    // lineHoriz.setAttributeNS(null, "stroke", "gray")
-    // lineVert.setAttributeNS(null, "stroke", "gray")
-
-
-    // // x = (0, 0), (100, 0), (200, 0), ...
-    // lineHoriz.setAttributeNS(null, "x1", 0)
-    // lineHoriz.setAttributeNS(null, "y1", 100 * i)
-    // // y = (0, 400), (100, 400), ...
-    // lineHoriz.setAttributeNS(null, "x2", 300)
-    // lineHoriz.setAttributeNS(null, "y2", 100 * i)
-
-    // lineVert.setAttributeNS(null, "x1", 100 * i)
-    // lineVert.setAttributeNS(null, "y1", 0)
-    // // y = (0, 400), (100, 400), ...
-    // lineVert.setAttributeNS(null, "x2", 100 * i)
-    // lineVert.setAttributeNS(null, "y2", 300)
-
-
-    baseSvg.appendChild(lineHoriz)
-    baseSvg.appendChild(lineVert)
-
+    svgCardRoot.appendChild(gridGroup);
+    svgCardRoot.appendChild(wallGroup);
+    svgCardRoot.appendChild(squareGroup);
 }
-
-cordinates.forEach(([i, j]) => {
-    const rect = document.createElementNS(SVG_NS_URI, "rect")
-    rect.setAttributeNS
-
-    applySvgArgs(rect, {
-        "stroke-width": 1,
-        stroke: "blue",
-        fill: "white",
-        width: 4,
-        height: 4,
-        x: 100 * i - 2,
-        y: 100 * j - 2,
-    })
-
-    baseSvg.appendChild(rect)
-})
-
-const randomCordIndex = Math.floor(Math.random() * cordinates.length)
-// Stupid way to do this:
-const neighbours = []
-
-if (randomCordIndex > 3) {
-    neighbours.push(randomCordIndex - 4)
-}
-
-if (randomCordIndex < 12) {
-    neighbours.push(randomCordIndex + 4)
-}
-
-if (randomCordIndex % 4 !== 0) {
-    neighbours.push(randomCordIndex - 1)
-}
-
-if (randomCordIndex % 4 !== 3) {
-    neighbours.push(randomCordIndex + 1)
-}
-
-const pointCircle = document.createElementNS(SVG_NS_URI, "circle")
-applySvgArgs(pointCircle, {
-    cx: cordinates[randomCordIndex][0] * 100,
-    cy: cordinates[randomCordIndex][1] * 100,
-    r: 8,
-    stroke: "red"
-})
-
-neighbours.forEach(i => {
-    const neighbourCircle = document.createElementNS(SVG_NS_URI, "circle")
-    applySvgArgs(neighbourCircle, {
-        cx: cordinates[i][0] * 100,
-        cy: cordinates[i][1] * 100,
-        r: 4,
-        stroke: "blue"
-    })
-    baseSvg.appendChild(neighbourCircle)
-
-})
-
-baseSvg.appendChild(pointCircle)
-
-// }
