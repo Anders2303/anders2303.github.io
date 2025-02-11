@@ -1,15 +1,5 @@
 const SVG_NS_URI = "http://www.w3.org/2000/svg";
 
-const GRID_STYLE = {
-    stroke: "gray",
-    "stroke-width": 1,
-};
-
-const WALL_STYLE = {
-    stroke: "#1a8e28",
-    "stroke-width": 8,
-};
-
 const SQUARE_STYLE = {
     "stroke-width": 2,
     stroke: "black",
@@ -18,26 +8,10 @@ const SQUARE_STYLE = {
     height: 6,
 };
 
-function compStyle(obj) {
-    return Object.entries(obj)
-        .map(([k, v]) => `${k}: ${v};`)
-        .join(" ");
-}
-
-function applySvgArgs(svgObj, attrObj) {
-    return Object.entries(attrObj).forEach(([k, v]) =>
-        svgObj.setAttributeNS(null, k, v)
-    );
-}
-
-// let cordinates = []
-
-// RUNS ON MOUNT
-generateCards();
-
 function generateCards(amt = 100) {
     // Clear children
-    // myNode.innerHTML = ''
+    // const cardContainer = document.getElementById("card-list");
+    // cardContainer.innerHTML = "";
 
     for (let index = 0; index < amt; index++) {
         generateCard(index);
@@ -45,33 +19,69 @@ function generateCards(amt = 100) {
 }
 
 function generateCard(cardNumber) {
-    const cardContainer = document.getElementById("card-container");
-
-    const downloadLink = document.createElement("a");
+    const sneakyDownloadLink = document.getElementById(
+        "sneakly-lil-download-buddy"
+    );
+    const cardContainer = document.getElementById("card-list");
+    const wrapperDiv = document.createElement("div");
+    cardContainer.appendChild(wrapperDiv);
 
     const svgCardRoot = document.createElementNS(SVG_NS_URI, "svg");
     applySvgArgs(svgCardRoot, {
-        class: "bg-white",
         width: "400px",
         height: "400px",
         viewBox: "-10 -10 320 320",
     });
 
+    const bgRect = document.createElementNS(SVG_NS_URI, "rect");
+    applySvgArgs(bgRect, {
+        height: 320,
+        width: 320,
+        x: -10,
+        y: -10,
+        fill: "white",
+    });
+
+    svgCardRoot.appendChild(bgRect);
     addLinesToSvg(svgCardRoot);
 
-    const svgBlob = new Blob([svgCardRoot.outerHTML], {
-        type: "image/svg+xml",
-    });
-    downloadLink.download = `room-tile-${cardNumber}.svg`;
-    downloadLink.href = window.URL.createObjectURL(svgBlob);
+    const downloadButton = document.createElement("button");
+    downloadButton.innerText = "Download";
+    downloadButton.className = [
+        "block mt-2 w-full",
+        "text-center",
+        "rounded",
+        "bg-gray-800 hover:bg-gray-600",
+        "text-white",
+        "p-2",
+    ].join(" ");
 
-    downloadLink.appendChild(svgCardRoot);
-    cardContainer.appendChild(downloadLink);
+    downloadButton.addEventListener("click", () => {
+        const cardClone = svgCardRoot.cloneNode(true);
+        const lostChildren = cardClone.querySelectorAll(".--hide-on-download");
+
+        for (const child of lostChildren) {
+            child.remove();
+        }
+
+        const svgBlob = new Blob([cardClone.outerHTML], {
+            type: "image/svg+xml",
+        });
+
+        sneakyDownloadLink.download = `room-tile-${cardNumber}.svg`;
+        sneakyDownloadLink.href = window.URL.createObjectURL(svgBlob);
+
+        console.log(sneakyDownloadLink);
+
+        sneakyDownloadLink.click();
+    });
+
+    wrapperDiv.appendChild(svgCardRoot);
+    wrapperDiv.appendChild(downloadButton);
 }
 
 function addLinesToSvg(svgCardRoot) {
     const squareGroup = document.createElementNS(SVG_NS_URI, "g");
-    const gridGroup = document.createElementNS(SVG_NS_URI, "g");
     const wallGroup = document.createElementNS(SVG_NS_URI, "g");
 
     for (let i = 0; i < 4; i++) {
@@ -89,36 +99,22 @@ function addLinesToSvg(svgCardRoot) {
             squareGroup.appendChild(rect);
 
             // Right wall
-            if (j % 4 !== 3) {
-                const rightLine = document.createElementNS(SVG_NS_URI, "line");
-                const isWall = Math.random() < 0.25;
 
-                applySvgArgs(rightLine, {
-                    ...(isWall ? WALL_STYLE : GRID_STYLE),
-                    x1: x,
-                    y1: y,
-                    x2: x + 100,
-                    y2: y,
-                });
-                (isWall ? wallGroup : gridGroup).appendChild(rightLine);
+            if (j % 4 !== 3) {
+                const rightLine = new Wall(wallGroup, "horizontal", [x, y]);
+                rightLine.render();
             }
             // Downward wall
             if (i < 3) {
-                const downLine = document.createElementNS(SVG_NS_URI, "line");
-                const isWall = Math.random() < 0.75;
-                applySvgArgs(downLine, {
-                    ...(isWall ? WALL_STYLE : GRID_STYLE),
-                    x1: x,
-                    y1: y,
-                    x2: x,
-                    y2: y + 100,
-                });
-                (isWall ? wallGroup : gridGroup).appendChild(downLine);
+                const downLine = new Wall(wallGroup, "vertical", [x, y]);
+                downLine.render();
             }
         }
     }
 
-    svgCardRoot.appendChild(gridGroup);
     svgCardRoot.appendChild(wallGroup);
     svgCardRoot.appendChild(squareGroup);
 }
+
+// RUNS ON MOUNT
+generateCards();
