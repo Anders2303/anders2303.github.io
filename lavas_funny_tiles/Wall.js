@@ -15,7 +15,7 @@ class Wall {
         this.direction = direction;
         this.position = position;
 
-        this.iCurrentVariant = Math.random() < 0.25 ? 0 : 1;
+        this.iCurrentVariant = Math.random() < 0.25 ? 1 : 0;
     }
 
     #currentVariant() {
