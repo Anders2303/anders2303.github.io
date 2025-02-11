@@ -4,8 +4,8 @@ const SQUARE_STYLE = {
     "stroke-width": 2,
     stroke: "black",
     fill: "#23e471",
-    width: 6,
-    height: 6,
+    width: 14,
+    height: 14,
 };
 
 function generateCards(amt = 100) {
@@ -30,15 +30,15 @@ function generateCard(cardNumber) {
     applySvgArgs(svgCardRoot, {
         width: "400px",
         height: "400px",
-        viewBox: "-10 -10 320 320",
+        viewBox: "-8 -8 316 316",
     });
 
     const bgRect = document.createElementNS(SVG_NS_URI, "rect");
     applySvgArgs(bgRect, {
-        height: 320,
-        width: 320,
-        x: -10,
-        y: -10,
+        height: 332,
+        width: 332,
+        x: -18,
+        y: -18,
         fill: "white",
     });
 

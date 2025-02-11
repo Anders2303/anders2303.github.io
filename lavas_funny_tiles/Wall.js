@@ -23,10 +23,10 @@ class Wall {
     }
 
     #getLinePadding() {
-        if (this.#currentVariant() === "open") return 4;
-        if (this.#currentVariant() === "solid") return 4;
-        if (this.#currentVariant() === "oneway_1") return 8;
-        if (this.#currentVariant() === "oneway_2") return 8;
+        if (this.#currentVariant() === "open") return 6;
+        if (this.#currentVariant() === "solid") return 6;
+        if (this.#currentVariant() === "oneway_1") return 12;
+        if (this.#currentVariant() === "oneway_2") return 12;
 
         return 0;
     }
@@ -63,19 +63,19 @@ class Wall {
             case "solid":
                 return {
                     stroke: "#1a8e28",
-                    "stroke-width": 8,
+                    "stroke-width": 16,
                     "stroke-dasharray": undefined,
                 };
             case "oneway_1":
                 return {
                     stroke: "red",
-                    "stroke-width": 8,
+                    "stroke-width": 16,
                     "stroke-dasharray": "8,3",
                 };
             case "oneway_2":
                 return {
                     stroke: "blue",
-                    "stroke-width": 8,
+                    "stroke-width": 16,
                     "stroke-dasharray": "8,3",
                 };
 
