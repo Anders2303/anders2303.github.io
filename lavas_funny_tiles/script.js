@@ -1,5 +1,3 @@
-const SVG_NS_URI = "http://www.w3.org/2000/svg";
-
 const SQUARE_STYLE = {
     "stroke-width": 2,
     stroke: "black",
@@ -28,6 +26,7 @@ function generateCard(cardNumber) {
     cardContainer.appendChild(wrapperDiv);
 
     const svgCardRoot = document.createElementNS(SVG_NS_URI, "svg");
+    svgCardRoot.setAttribute("xmlns:xlink", SVG_XLINK_URI);
     applySvgArgs(svgCardRoot, {
         width: "400px",
         height: "400px",

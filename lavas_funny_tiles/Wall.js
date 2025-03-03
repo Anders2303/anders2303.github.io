@@ -44,6 +44,7 @@ class Wall {
 
             applySvgArgs(symbol, {
                 id: id,
+                "data-name": id,
                 width: "100",
                 height: SOLID_STROKE_WIDTH,
                 viewBox: `0 0 100 ${SOLID_STROKE_WIDTH}`,
@@ -137,9 +138,12 @@ class Wall {
 
             this.#initClickZone();
         }
-
+        this.el.setAttributeNS(
+            SVG_XLINK_URI,
+            "xlink:href",
+            `#${this.#currentVariant()}`
+        );
         applySvgArgs(this.el, {
-            href: `#${this.#currentVariant()}`,
             x: this.position[0],
             y: this.position[1] - 8,
             ...this.#directionArgs(),
