@@ -1,8 +1,25 @@
+const SOLID_STROKE_WIDTH = 16;
+
+const symbolAttrsMap = {
+    openWall: { "stroke-width": 1, stroke: "gray" },
+    solidWall: { "stroke-width": SOLID_STROKE_WIDTH, stroke: "#1a8e28" },
+    oneWayWall1: {
+        stroke: "red",
+        "stroke-width": SOLID_STROKE_WIDTH,
+        "stroke-dasharray": "8,3",
+    },
+    oneWayWall2: {
+        stroke: "blue",
+        "stroke-width": SOLID_STROKE_WIDTH,
+        "stroke-dasharray": "8,3",
+    },
+};
+
 class Wall {
     direction = "horizontal"; /* or "vertical" */
     position = [-1, -1];
 
-    variants = ["open", "solid", "oneway_1", "oneway_2"];
+    variants = Object.keys(symbolAttrsMap);
     iCurrentVariant = 0;
 
     parent = null;
@@ -15,72 +32,68 @@ class Wall {
         this.direction = direction;
         this.position = position;
 
-        this.iCurrentVariant = Math.random() < 0.25 ? 1 : 0;
+        this.iCurrentVariant = Math.random() < 0.4 ? 1 : 0;
+    }
+
+    static attachSymbols(svgParent) {
+        Object.entries(symbolAttrsMap).forEach(([id, variantStyle]) => {
+            const symbol = document.createElementNS(SVG_NS_URI, "symbol");
+            const line = document.createElementNS(SVG_NS_URI, "line");
+            symbol.appendChild(line);
+            svgParent.appendChild(symbol);
+
+            applySvgArgs(symbol, {
+                id: id,
+                width: "100",
+                height: SOLID_STROKE_WIDTH,
+                viewBox: `0 0 100 ${SOLID_STROKE_WIDTH}`,
+            });
+
+            applySvgArgs(line, {
+                x1: 0,
+                y1: SOLID_STROKE_WIDTH / 2,
+                x2: 100,
+                y2: SOLID_STROKE_WIDTH / 2,
+                ...variantStyle,
+            });
+        });
     }
 
     #currentVariant() {
         return this.variants[this.iCurrentVariant];
     }
 
-    #getLinePadding() {
-        if (this.#currentVariant() === "open") return 6;
-        if (this.#currentVariant() === "solid") return 6;
-        if (this.#currentVariant() === "oneway_1") return 12;
-        if (this.#currentVariant() === "oneway_2") return 12;
-
-        return 0;
-    }
-
     #getPositionAttrs() {
         const [x, y] = this.position;
-        const padding = this.#getLinePadding();
 
         if (this.direction === "horizontal") {
             return {
-                x1: x + padding,
+                x1: x,
                 y1: y,
-                x2: x + 100 - padding,
+                x2: x + 100,
                 y2: y,
             };
         } else {
             return {
                 x1: x,
-                y1: y + padding,
+                y1: y,
                 x2: x,
-                y2: y + 100 - padding,
+                y2: y + 100,
             };
         }
     }
 
-    #getStyleAttrs() {
-        switch (this.#currentVariant()) {
-            case "open":
-                return {
-                    stroke: "gray",
-                    "stroke-width": 1,
-                    "stroke-dasharray": undefined,
-                };
-            case "solid":
-                return {
-                    stroke: "#1a8e28",
-                    "stroke-width": 16,
-                    "stroke-dasharray": undefined,
-                };
-            case "oneway_1":
-                return {
-                    stroke: "red",
-                    "stroke-width": 16,
-                    "stroke-dasharray": "8,3",
-                };
-            case "oneway_2":
-                return {
-                    stroke: "blue",
-                    "stroke-width": 16,
-                    "stroke-dasharray": "8,3",
-                };
-
-            default:
-                console.warn(this.#currentVariant());
+    #directionArgs() {
+        if (this.direction !== "horizontal") {
+            return {
+                transform: `rotate(
+                    90,
+                    ${this.position[0]},
+                    ${this.position[1]}
+                )`,
+            };
+        } else {
+            return {};
         }
     }
 
@@ -119,13 +132,17 @@ class Wall {
 
     render() {
         if (!this.el) {
-            this.el = document.createElementNS(SVG_NS_URI, "line");
+            this.el = document.createElementNS(SVG_NS_URI, "use");
             this.parent.appendChild(this.el);
 
             this.#initClickZone();
         }
 
-        applySvgArgs(this.el, this.#getStyleAttrs());
-        applySvgArgs(this.el, this.#getPositionAttrs());
+        applySvgArgs(this.el, {
+            href: `#${this.#currentVariant()}`,
+            x: this.position[0],
+            y: this.position[1] - 8,
+            ...this.#directionArgs(),
+        });
     }
 }

@@ -22,6 +22,7 @@ function generateCard(cardNumber) {
     const sneakyDownloadLink = document.getElementById(
         "sneakly-lil-download-buddy"
     );
+
     const cardContainer = document.getElementById("card-list");
     const wrapperDiv = document.createElement("div");
     cardContainer.appendChild(wrapperDiv);
@@ -81,6 +82,8 @@ function generateCard(cardNumber) {
 }
 
 function addLinesToSvg(svgCardRoot) {
+    Wall.attachSymbols(svgCardRoot);
+
     const squareGroup = document.createElementNS(SVG_NS_URI, "g");
     const wallGroup = document.createElementNS(SVG_NS_URI, "g");
 
